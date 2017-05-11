@@ -25,7 +25,29 @@ There are several files which user need to prepare to run the pipeline.
 
 # 3. Edit configurations in Snakemake
 
-In the `Snakemake` file in the root folder, there are a couple of parameters
+In the `Snakemake` file in the root folder, there are a couple of parameters user should set-up.
+
+## In `rule quant_samples`
+
+| parameters        | Contents                                                                          |
+|-------------------|-----------------------------------------------------------------------------------|
+| `input.lib`       | The path of the sgRNA library                                                     |
+| `input.fq`        | A wildcard path of the RNAseq data                                                |
+| `params.adapt`    | The 5' adaptor sequence which should be trimmed in a RNAseq                       |
+| `params.err_trim` | Parameter for accepting mismatch for trimming. `cutadapt` is used for the process |
+| `params.mismatch` | Parameter for accepting mismatch for the sgRNA quantification                     |
+
+## In `run_analysis`
+
+| parameters         | Contents                                                                           |
+|--------------------|------------------------------------------------------------------------------------|
+|`params.lib_path`   |The path contains all scripts in the pipeline                                       |
+|`params.input_path` |The path will contain inputs such as label and data summarization                   |
+|`params.output_path`|The path will contain output files                                                  |
+|`params.study`      |Type of design of the study (`dropout` or `enrichment`)                             |
+|`params.base_group` |The baseline group in the pooled study experiment                                   |
+|`params.stat_test`  |The hypothesis test method will be used in the pipeline (`logt`, `deseq2` or `ibb`) |
+
 
 # 4. Run pipeline
 
