@@ -6,3 +6,4 @@ reads/*.stat.txt
 .snakemake/
 data/mapping.txt
 data/summary.txt
+output/*
