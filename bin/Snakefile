@@ -1,0 +1,15 @@
+SAMPLES, = glob_wildcards("../reads/{sample}.fastq.gz")
+
+rule all:
+	input:
+		expand("../reads/{sample}.out", sample=SAMPLES)
+
+rule quant_samples:
+	input:
+		lib = "../libs/lib_example.fa", 
+		fq = "../reads/{sample}.fastq.gz",
+	output:
+		"../reads/{sample}.out"
+	shell:
+		"./quantSamples.py {input.lib} {input.fq}" 
+
