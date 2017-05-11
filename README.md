@@ -62,3 +62,37 @@ Snakemake also allows multi-core processing with the `-ncores` parameter.
 ```
 $ Snakemake –ncores=4
 ```
+
+# 5. Add a customized test
+For a customized test, user must add a function and modified `bin/stat.test.R` with the following instruction:
+
+1. add a function like below, the parameters are the read counts for each group to run the test.
+
+```
+run.deseq2 <- function(cnt.t0, cnt.t1) {
+  library(DESeq2)
+  ret <- list()
+  col.data <- data.frame(condition=rep("T0", ncol(cnt.t0)), row.names = colnames(cnt.t0))
+  col.data <- rbind(col.data, data.frame(condition=rep("T1", ncol(cnt.t1)), row.names=colnames(cnt.t1)))
+  col.data$condition <- factor(col.data$condition, levels = c("T0", "T1"))
+  print(col.data)
+  count.matrix <- cbind(cnt.t0, cnt.t1)
+  ckCDS <- DESeqDataSetFromMatrix(countData = round(count.matrix),
+                                colData = col.data,
+                                design =~condition)
+  dds <-DESeq(ckCDS)
+  res <- as.data.frame(results(dds))
+  ret$fc <- res$log2FoldChange
+  ret$p.value <- res$pvalue
+  ret$p.adjust <- res$padj
+  return(ret)
+}
+```
+
+2. If the function is `run.custom` and if `parameter.stat_test` in Snakemake would be `custom` then put the code between `line 119` and `line 120` like this:
+
+```
+    else if(sel.test=="custom") {
+      ret <- run.deseq2(cnt.t0, cnt.t1)
+    }
+```
