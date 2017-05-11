@@ -1,7 +1,7 @@
 generate.xlsx <- function(dir) {
   file.mapping <- file.path(dir, "CPTM.txt")
   file.stat <- file.path(dir, "stat.test.txt")
-  file.output <- file.path(dir,"hit.list.xlsx")
+  file.output <- file.path(dir,"result.xlsx")
   file.dir <- file.path(dir, "dir.score.Rdata")
   df.map <- read.table(file.mapping, header=T, stringsAsFactors=F, row.names=NULL) %>%
     separate(name, c("gene", "sRNAIdx"), sep="_") 

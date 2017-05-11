@@ -2,4 +2,7 @@ bin/.snakemake/
 reads/*.fastq.gz
 reads/*.out
 reads/*.agg
+reads/*.stat.txt
 .snakemake/
+data/mapping.txt
+data/summary.txt

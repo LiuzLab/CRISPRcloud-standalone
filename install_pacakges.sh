@@ -1,4 +1,7 @@
 #/usr/bin/bash
+cd src
+Makefile
+cd ..
 sudo R -e "install.packages('stringr',repo='https://cloud.r-project.org/')"
 sudo R -e "install.packages('ggrepel',repo='https://cloud.r-project.org/')"
 sudo R -e "install.packages('RColorBrewer',repo='https://cloud.r-project.org/')"

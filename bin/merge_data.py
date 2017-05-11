@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 from glob import glob
 from collections import Counter, defaultdict
 import errno
@@ -14,22 +15,23 @@ def mkdir_p(path):
 groups = defaultdict( str )
 sample = defaultdict( str )
 reps = defaultdict(int)
-with open('label.txt', 'r') as inp:
+with open('data/label.txt', 'r') as inp:
     for line in inp:
         k, v1, v2 = line.strip().split()
-        sample[v1] = k
-        groups[v1] = v2
-        reps[v1] = int(v1[-1])
+        sample_id = v1 + v2
+        sample[sample_id] = k
+        groups[sample_id] = v1
+        reps[sample_id] = v2
 tot_reads = defaultdict(int)
 trim_reads = defaultdict(int)
 map_reads = defaultdict(int)
 counts = defaultdict( Counter )
 
 libs = None
-for agg_fname in glob("*.agg"):
+for agg_fname in glob("reads/*.agg"):
     out_fname = agg_fname.replace(".agg",".out")
     stat_fname = agg_fname.replace(".agg",".stat.txt")
-    prefix = agg_fname.split("_")[0]
+    prefix = agg_fname.replace("reads/","").replace(".agg","")
     with open(out_fname, "r") as inp:
         tmp = [(x.split()[0],int(x.split()[-1])) for x in inp.read().strip().split('\n')]
         counts[prefix] += Counter(dict(tmp))
@@ -43,13 +45,14 @@ for agg_fname in glob("*.agg"):
 
     with open(agg_fname, 'r') as inp:
         trim_reads[prefix] += sum([int(x.strip().split()[-1]) for x in inp ])
+
 for p in counts:
     map_reads[p] += counts[p]["Total:"]
     del counts[p]["Total:"]
 
-mkdir_p("../stat")
+mkdir_p("data")
 
-with open("../stat/summary.txt", "w") as oup:
+with open("data/summary.txt", "w") as oup:
     print >> oup, ",".join(["sample.id", "group", "rep", "tot_reads", "trimmed_reads", \
             "mapped_reads"])
     for sid in sorted(sample):
@@ -59,7 +62,7 @@ with open("../stat/summary.txt", "w") as oup:
                 map(str,[tot_reads[csid], trim_reads[csid], map_reads[csid]]) )
 
 
-with open("../stat/mapping.txt", "w") as oup:
+with open("data/mapping.txt", "w") as oup:
     print >> oup, ",".join(["sRNA"]+sorted(sample))
     for s in libs:
         print >> oup, ",".join(map(str,[s]+[counts[c][s] for c in [ sample[i] for i in sorted(sample)]]))

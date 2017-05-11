@@ -50,22 +50,19 @@ run.deseq2 <- function(cnt.t0, cnt.t1) {
 }
 
 
-run.stats <- function(dir, sel.test = "ibb",
+run.stats <- function(input.dir, output.dir, sel.test = "ibb",
                       t0="Base",
                       path.summary="summary.txt",
                       path.mapping="mapping.txt",
                       path.mapping.filtered="mapping.filtered.txt",
                       path.test="stat.test.txt",
                       cut.off = 1) {
-  print(t0)
-  print(sel.test)
-  print(sprintf("running %s", dir))
   norm.const <- 1e7
   rep.row<-function(x,n) matrix(rep(x,each=n),nrow=n)
-  file.summary <- file.path(dir,path.summary)
-  file.mapping <- file.path(dir,path.mapping)
-  file.test  <- file.path(dir,path.test)
-  file.mapping.filtered <- file.path(dir,path.mapping.filtered)
+  file.summary <- file.path(input.dir,path.summary)
+  file.mapping <- file.path(input.dir,path.mapping)
+  file.test  <- file.path(output.dir,path.test)
+  file.mapping.filtered <- file.path(output.dir,path.mapping.filtered)
 
   df.map <- read.csv(file.mapping, stringsAsFactors = F)
 
@@ -78,6 +75,7 @@ run.stats <- function(dir, sel.test = "ibb",
   GROUP <- unique(df.summary$group)
 
   symbol <- df.map$sRNA # keep it mind
+  print(length(symbol))
   row.names(df.map) <- symbol
   df.map <- df.map[,c(-1)]
   take.by.group <- function(sel.col) {
@@ -88,7 +86,6 @@ run.stats <- function(dir, sel.test = "ibb",
   G <- take.by.group("sample.id")
   R <- take.by.group("rep")
   N <- take.by.group("mapped_reads")
-  print(head(df.map))
   C <- sapply(G, function(g) df.map[,g, drop = FALSE], simplify = F)
   # nz.row <- which(rowSums(df.map[, G[["Base"]], drop=FALSE ]<cut.off)==0)
   nz.row <- which(rowSums(df.map[,, drop=FALSE ]>=cut.off)>0)
@@ -107,7 +104,6 @@ run.stats <- function(dir, sel.test = "ibb",
     n.t1 <- N[[t1]][t1.pos]
     norm.t0 <- cnt.t0 / rep.row(n.t0, nrow(cnt.t0)) * norm.const
     norm.t1 <- cnt.t1 / rep.row(n.t1, nrow(cnt.t1)) * norm.const
-
     if(sel.test=="ibb") {
       ret <- run.ibb.test(cnt.t0, cnt.t1, n.t0, n.t1 )
       ret$fc <- rowMeans(log2(norm.t1+1)-log2(norm.t0+1))
@@ -130,7 +126,7 @@ run.stats <- function(dir, sel.test = "ibb",
 
 
 # 
-# run.stats(dir="/tmp/save_430/", sel.test = "deseq2",
+# run.stats(input.dir="/tmp/save_430/", sel.test = "deseq2",
 #                       t0="Base",
 #                       path.summary="summary.txt",
 #                       path.mapping="mapping.txt",
